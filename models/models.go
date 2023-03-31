@@ -7,7 +7,7 @@ type Message struct {
 
 type Requset struct {
 	Model            string                 `json:"model,omitempty"`
-	Messages         []Message             `json:"messages,omitempty"`
+	Messages         []Message              `json:"messages,omitempty"`
 	Temperature      float64                `json:"temperature,omitempty"`
 	TopP             float64                `json:"top_p,omitempty"`
 	Stream           bool                   `json:"stream,omitempty"`
@@ -37,4 +37,9 @@ type Response struct {
 	Created int64    `json:"created,omitempty"`
 	Choices []Choice `json:"choices,omitempty"`
 	Usage   `json:"usage,omitempty"`
+}
+
+type ChatRequest struct {
+	Content string `json:"content" form:"content"`
+	Tokens  int    `json:"tokens" form:"tokens"`
 }

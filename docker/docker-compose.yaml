@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  openai:
+    image: mengbin92/openai:latest
+    container_name: openai
+    volumes:
+      - ./openai:/app/openai
+    environment:
+      - APIKEY={{APIKEY}}
+      - GIN_MODE=release
+      # - ORG=
+      # - PROXY=
+    ports:
+      - 18080:9999

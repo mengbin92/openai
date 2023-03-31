@@ -1,41 +1,37 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"fmt"
-	"io"
+	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
-	"github.com/bytedance/sonic"
-	"github.com/mengbin92/openai/client"
-	"github.com/mengbin92/openai/models"
+	"github.com/mengbin92/openai/server"
 )
 
 func main() {
-	apikey := os.Getenv("APIKEY")
+	sv := server.NewServer()
 
-	client := client.NewClient(apikey, "")
+	go func() {
+		// 服务连接
+		if err := sv.Run("9999"); err != nil && err != http.ErrServerClosed {
+			panic(fmt.Sprintf("listen: %s\n", err))
+		}
+	}()
 
-	req := models.Requset{
-		Model: "gpt-3.5-turbo",
-		Messages: []models.Message{
-			{Role: "user", Content: "Say this is a test"},
-		},
-		Temperature: 0.7,
+	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	log.Println("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := sv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
 	}
-
-	reqByte, _ := sonic.Marshal(req)
-	resp, err := client.Do("POST", bytes.NewBuffer(reqByte))
-	if err != nil {
-		panic(err)
-	}
-	body, _ := io.ReadAll(resp.Body)
-	defer resp.Body.Close()
-
-	respChat := &models.Response{}
-	err = sonic.Unmarshal(body, respChat)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Print(respChat)
+	log.Println("Server exiting")
 }
