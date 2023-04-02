@@ -16,6 +16,10 @@ func (s *Server) chat(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	tokens := 5
+	if chat.Tokens != 0 {
+		tokens = chat.Tokens
+	}
 	resp, err := s.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -23,10 +27,10 @@ func (s *Server) chat(ctx *gin.Context) {
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Content: chat.Content,
 				},
 			},
-			MaxTokens: 5,
+			MaxTokens: tokens,
 		},
 	)
 	if err != nil {
