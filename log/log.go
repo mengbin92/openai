@@ -31,5 +31,24 @@ func DefaultLogger() *zap.Logger {
 
 	coreArr = append(coreArr, infoCore)
 	coreArr = append(coreArr, errorCore)
-	return zap.New(zapcore.NewTee(coreArr...), zap.AddCaller())
+	return setLogLevel(zap.New(zapcore.NewTee(coreArr...), zap.AddCaller()))
+}
+
+func setLogLevel(log *zap.Logger) *zap.Logger {
+	switch os.Getenv("LOG_LEVEL") {
+	case "DEBUG":
+		return log.WithOptions(zap.IncreaseLevel(zapcore.DebugLevel))
+	case "INFO":
+		return log.WithOptions(zap.IncreaseLevel(zapcore.InfoLevel))
+	case "ERROR":
+		return log.WithOptions(zap.IncreaseLevel(zapcore.WarnLevel))
+	case "DPANIC":
+		return log.WithOptions(zap.IncreaseLevel(zapcore.DPanicLevel))
+	case "PANIC":
+		return log.WithOptions(zap.IncreaseLevel(zapcore.PanicLevel))
+	case "FATAL":
+		return log.WithOptions(zap.IncreaseLevel(zapcore.FatalLevel))
+	default:
+		return log.WithOptions(zap.IncreaseLevel(zapcore.ErrorLevel))
+	}
 }

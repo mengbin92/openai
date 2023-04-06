@@ -4,12 +4,14 @@ services:
   openai:
     image: mengbin92/openai:latest
     container_name: openai
-    volumes:
-      - ./openai:/app/openai
+    # volumes:
+    #   - ./openai:/app/openai
     environment:
       - APIKEY={{APIKEY}}
       - GIN_MODE=release
       # - ORG=
       # - PROXY=
+      - LOG_LEVEL=ERROR
+      - TOKEN=token
     ports:
       - 18080:9999
