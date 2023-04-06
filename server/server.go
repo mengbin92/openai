@@ -49,8 +49,10 @@ func NewServer() *Server {
 func (s *Server) Run(port string) error {
 	engine := gin.Default()
 
-	engine.GET("/chat", s.chat)
-	engine.GET("/wxChat", s.wxChat)
+	engine.GET("/chat", chat)
+	engine.GET("/wxChat", wxChat)
+	engine.GET("/models",listModels)
+	engine.GET("/completion",completion)
 
 	s.sv = &http.Server{
 		Addr:    ":" + port,

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -10,9 +11,10 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/gin-gonic/gin"
 	"github.com/mengbin92/openai/models"
+	"github.com/sashabaranov/go-openai"
 )
 
-func (s *Server) chat(ctx *gin.Context) {
+func chat(ctx *gin.Context) {
 	chat := &models.ChatRequest{}
 	if err := ctx.Bind(chat); err != nil {
 		logger.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
@@ -32,7 +34,7 @@ func (s *Server) chat(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }
 
-func (s *Server) wxChat(ctx *gin.Context) {
+func wxChat(ctx *gin.Context) {
 	logger.Info("Get Msg from wechat")
 	verify := &models.WeChatVerify{
 		Signature: ctx.Query("signature"),
@@ -81,4 +83,41 @@ func (s *Server) wxChat(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("unknow MsgType: %s", reqBody.MsgType)})
 		return
 	}
+}
+
+func listModels(ctx *gin.Context) {
+	logger.Info("List and describe the various models available in the API")
+	resp, err := client.ListModels(ctx)
+	if err != nil {
+		logger.Errorf("call chatGPT got error: %s", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("call ListModels got error: %s", err.Error())})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func completion(ctx *gin.Context) {
+	chat := &models.ChatRequest{}
+	if err := ctx.Bind(chat); err != nil {
+		logger.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// tokens := 5
+	// if chat.Tokens != 0 {
+	// 	tokens = chat.Tokens
+	// }
+	resp, err := client.CreateCompletion(
+		context.Background(),
+		openai.CompletionRequest{
+			Model:  openai.GPT3TextDavinci003,
+			Prompt: chat.Content,
+		},
+	)
+	if err != nil {
+		logger.Errorf("get completion response from openai error: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }

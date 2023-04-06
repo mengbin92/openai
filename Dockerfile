@@ -1,4 +1,4 @@
-FROM golang:1.19.7-alpine AS builder
+FROM golang:1.20.3-alpine AS builder
 LABEL maintainer="mengbin1992@outlook.com"
 
 COPY . /go/src/openai/
@@ -9,7 +9,7 @@ ENV CGO_ENABLED=0
 WORKDIR /go/src/openai
 RUN cd /go/src/openai && go build -ldflags "-s -w" -o openai
 
-FROM alpine:3.17.0
+FROM alpine:3.17
 LABEL maintainer="mengbin1992@outlook.com"
 
 RUN mkdir /app
