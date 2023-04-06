@@ -10,12 +10,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-type Server struct {
-	client *openai.Client
-	sv     *http.Server
-}
-
-func NewServer() *Server {
+func init() {
 	token := os.Getenv("APIKEY")
 	org := os.Getenv("ORG")
 	proxyURL := os.Getenv("PROXY")
@@ -39,10 +34,16 @@ func NewServer() *Server {
 		httpClient = &http.Client{}
 	}
 	defaultConfig.HTTPClient = httpClient
+	client = openai.NewClientWithConfig(defaultConfig)
+}
 
-	return &Server{
-		client: openai.NewClientWithConfig(defaultConfig),
-	}
+type Server struct {
+	sv *http.Server
+}
+
+func NewServer() *Server {
+
+	return &Server{}
 }
 
 func (s *Server) Run(port string) error {

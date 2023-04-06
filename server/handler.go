@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -11,7 +10,6 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/gin-gonic/gin"
 	"github.com/mengbin92/openai/models"
-	openai "github.com/sashabaranov/go-openai"
 )
 
 func (s *Server) chat(ctx *gin.Context) {
@@ -25,19 +23,7 @@ func (s *Server) chat(ctx *gin.Context) {
 	if chat.Tokens != 0 {
 		tokens = chat.Tokens
 	}
-	resp, err := s.client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: chat.Content,
-				},
-			},
-			MaxTokens: tokens,
-		},
-	)
+	resp, err := goChat(chat.Content, tokens)
 	if err != nil {
 		logger.Errorf("get chat response from openai error: %s", err.Error())
 		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "error": err.Error()})
@@ -79,7 +65,13 @@ func (s *Server) wxChat(ctx *gin.Context) {
 		resp.ToUserName = reqBody.FromUserName
 		resp.CreateTime = time.Now().Unix()
 		resp.MsgType = "text"
-		resp.Content = reqBody.Content
+		chatResp, err := goChat(reqBody.Content, 0)
+		if err != nil {
+			logger.Errorf("call chatGPT got error: %s", err.Error())
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("call chatGPT got error: %s", err.Error())})
+			return
+		}
+		resp.Content = chatResp.Choices[0].Message.Content
 		respBytes, _ := xml.Marshal(resp)
 		logger.Infof("return msg to wechat: %s", string(respBytes))
 		ctx.Writer.Header().Set("Content-Type", "text/xml")
