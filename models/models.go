@@ -58,6 +58,12 @@ type ChatRequest struct {
 	Tokens  int    `json:"tokens" form:"tokens"`
 }
 
+type WeChatInfo struct {
+	Token     string
+	AppID     string
+	Appsecret string
+}
+
 type WeChatVerify struct {
 	Signature string `json:"signature" form:"signature"`
 	Timestamp string `json:"timestamp" form:"timestamp"`

@@ -3,15 +3,15 @@ package server
 import (
 	"context"
 
-	"github.com/mengbin92/openai/log"
+	"github.com/mengbin92/openai/models"
 	openai "github.com/sashabaranov/go-openai"
-	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 var (
-	logger = log.DefaultLogger().Sugar()
-	token  = viper.GetString("openai.token")
-	client *openai.Client
+	logger     *zap.SugaredLogger
+	weChatInfo *models.WeChatInfo
+	client     *openai.Client
 )
 
 func goChat(msg string, tokens int) (openai.ChatCompletionResponse, error) {

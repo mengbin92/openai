@@ -15,6 +15,7 @@ import (
 )
 
 func chat(ctx *gin.Context) {
+	logger.Infof("Get msg from openai")
 	chat := &models.ChatRequest{}
 	if err := ctx.Bind(chat); err != nil {
 		logger.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
@@ -34,7 +35,7 @@ func chat(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }
 
-func wxChat(ctx *gin.Context) {
+func weChatVerify(ctx *gin.Context) {
 	logger.Info("Get Msg from wechat")
 	verify := &models.WeChatVerify{
 		Signature: ctx.Query("signature"),
@@ -42,7 +43,23 @@ func wxChat(ctx *gin.Context) {
 		Nonce:     ctx.Query("nonce"),
 		Echostr:   ctx.Query("echostr"),
 	}
-	if !verify.Verify(token) {
+	if !verify.Verify(weChatInfo.Token) {
+		logger.Error("WeChat Verify failed")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "WeChat Verify failed"})
+		return
+	}
+	ctx.Writer.WriteString(verify.Echostr)
+}
+
+func weChat(ctx *gin.Context) {
+	logger.Info("Get Msg from wechat")
+	verify := &models.WeChatVerify{
+		Signature: ctx.Query("signature"),
+		Timestamp: ctx.Query("timestamp"),
+		Nonce:     ctx.Query("nonce"),
+		Echostr:   ctx.Query("echostr"),
+	}
+	if !verify.Verify(weChatInfo.Token) {
 		logger.Error("WeChat Verify failed")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "WeChat Verify failed"})
 		return

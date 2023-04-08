@@ -6,6 +6,8 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mengbin92/openai/log"
+	"github.com/mengbin92/openai/models"
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
 )
@@ -43,6 +45,12 @@ type Server struct {
 
 func NewServer() *Server {
 	initOpenAIClient()
+	weChatInfo = &models.WeChatInfo{
+		AppID:     viper.GetString("wechat.appID"),
+		Appsecret: viper.GetString("wechat.appsecret"),
+		Token:     viper.GetString("wechat.token"),
+	}
+	logger = log.DefaultLogger().Sugar()
 	return &Server{}
 }
 
@@ -50,7 +58,8 @@ func (s *Server) Run(port string) error {
 	engine := gin.Default()
 
 	engine.GET("/chat", chat)
-	engine.GET("/wxChat", wxChat)
+	engine.GET("/wx", weChatVerify)
+	engine.POST("/wx", weChat)
 	engine.GET("/models", listModels)
 	engine.GET("/completion", completion)
 
