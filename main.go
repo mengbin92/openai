@@ -10,11 +10,17 @@ import (
 	"time"
 
 	"github.com/mengbin92/openai/server"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	sv := server.NewServer()
+	viper.SetConfigFile("./conf/config.yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Sprintf("load config error: %s", err.Error()))
+	}
 
+	sv := server.NewServer()
 	go func() {
 		// 服务连接
 		if err := sv.Run("9999"); err != nil && err != http.ErrServerClosed {

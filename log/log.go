@@ -3,6 +3,7 @@ package log
 import (
 	"os"
 
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -35,7 +36,7 @@ func DefaultLogger() *zap.Logger {
 }
 
 func setLogLevel(log *zap.Logger) *zap.Logger {
-	switch os.Getenv("LOG_LEVEL") {
+	switch viper.GetString("log.level") {
 	case "DEBUG":
 		return log.WithOptions(zap.IncreaseLevel(zapcore.DebugLevel))
 	case "INFO":

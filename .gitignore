@@ -1,3 +1,4 @@
 openai
 *.tar
 *.zip
+data/

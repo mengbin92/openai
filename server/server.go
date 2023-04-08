@@ -4,18 +4,18 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
+	"github.com/spf13/viper"
 )
 
-func init() {
-	token := os.Getenv("APIKEY")
-	org := os.Getenv("ORG")
-	proxyURL := os.Getenv("PROXY")
+func initOpenAIClient() {
+	apikey := viper.GetString("openai.apikey")
+	org := viper.GetString("openai.org")
+	proxyURL := viper.GetString("openai.proxy")
 
-	defaultConfig := openai.DefaultConfig(token)
+	defaultConfig := openai.DefaultConfig(apikey)
 	defaultConfig.OrgID = org
 
 	var httpClient *http.Client
@@ -42,7 +42,7 @@ type Server struct {
 }
 
 func NewServer() *Server {
-
+	initOpenAIClient()
 	return &Server{}
 }
 
@@ -51,8 +51,8 @@ func (s *Server) Run(port string) error {
 
 	engine.GET("/chat", chat)
 	engine.GET("/wxChat", wxChat)
-	engine.GET("/models",listModels)
-	engine.GET("/completion",completion)
+	engine.GET("/models", listModels)
+	engine.GET("/completion", completion)
 
 	s.sv = &http.Server{
 		Addr:    ":" + port,

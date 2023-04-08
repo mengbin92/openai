@@ -2,15 +2,15 @@ package server
 
 import (
 	"context"
-	"os"
 
 	"github.com/mengbin92/openai/log"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/spf13/viper"
 )
 
 var (
 	logger = log.DefaultLogger().Sugar()
-	token  = os.Getenv("TOKEN")
+	token  = viper.GetString("openai.token")
 	client *openai.Client
 )
 

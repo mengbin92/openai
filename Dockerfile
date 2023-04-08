@@ -15,6 +15,7 @@ LABEL maintainer="mengbin1992@outlook.com"
 RUN mkdir /app
 
 COPY --from=builder /go/src/openai/openai /app
+COPY conf /app/conf
 
 WORKDIR /app
 

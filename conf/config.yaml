@@ -1,0 +1,15 @@
+version: 1.0.0
+
+openai:
+  apikey: {{API_KEY}}
+  org:
+  proxy: http://172.26.128.1:1080
+
+redis:
+  addr: localhost:6379
+  db: 0
+  password:
+
+log:
+  # 支持debug(-1)、info(0)、warn(1)、error(2)、dpanic(3)、panic(4)、fatal(5)
+  level: 2

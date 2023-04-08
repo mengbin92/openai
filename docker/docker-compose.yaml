@@ -4,14 +4,27 @@ services:
   openai:
     image: mengbin92/openai:latest
     container_name: openai
-    # volumes:
-    #   - ./openai:/app/openai
+    volumes:
+      - ./conf:/app/conf
+      - ./wfi.sh:/app/wfi.sh
+    command: /app/wfi.sh -d apiserver-mysql:3306 -c '/app/openai'
     environment:
-      - APIKEY={{APIKEY}}
-      - GIN_MODE=release
-      # - ORG=
-      # - PROXY=
-      - LOG_LEVEL=ERROR
-      - TOKEN=token
+      - GIN_MODE=debug
     ports:
       - 18080:9999
+    networks:
+      - openai
+
+  redis:
+    image: redis:7.0.10
+    container_name: redis
+    volumes:
+      - ./redis/data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    networks:
+      - openai
+
+networks:
+  openai:
