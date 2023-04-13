@@ -7,7 +7,7 @@ services:
     volumes:
       - ./conf:/app/conf
       - ./wfi.sh:/app/wfi.sh
-    command: /app/wfi.sh -d redis:6379 -c '/app/openai'
+    command: /app/wfi.sh -d redis:6379 -c '/app/watcher'
     environment:
       - GIN_MODE=debug
     ports:
