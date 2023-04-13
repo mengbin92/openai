@@ -12,30 +12,29 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mengbin92/openai/common/cache"
 	"github.com/mengbin92/openai/models"
-	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
 )
 
-func chat(ctx *gin.Context) {
-	logger.Infof("Get msg from openai")
-	chat := &models.ChatRequest{}
-	if err := ctx.Bind(chat); err != nil {
-		logger.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	tokens := 5
-	if chat.Tokens != 0 {
-		tokens = chat.Tokens
-	}
-	resp, err := goChat(chat.Content, tokens)
-	if err != nil {
-		logger.Errorf("get chat response from openai error: %s", err.Error())
-		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "error": err.Error()})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
-}
+// func chat(ctx *gin.Context) {
+// 	logger.Infof("Get msg from openai")
+// 	chat := &models.ChatRequest{}
+// 	if err := ctx.Bind(chat); err != nil {
+// 		logger.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
+// 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// 	tokens := 5
+// 	if chat.Tokens != 0 {
+// 		tokens = chat.Tokens
+// 	}
+// 	resp, err := goChat(chat.Content, tokens)
+// 	if err != nil {
+// 		logger.Errorf("get chat response from openai error: %s", err.Error())
+// 		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "error": err.Error()})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+// }
 
 func weChatVerify(ctx *gin.Context) {
 	logger.Info("Get Msg from wechat")
@@ -125,39 +124,19 @@ func weChat(ctx *gin.Context) {
 	}
 }
 
-func listModels(ctx *gin.Context) {
-	logger.Info("List and describe the various models available in the API")
-	resp, err := client.ListModels(ctx)
-	if err != nil {
-		logger.Errorf("call chatGPT got error: %s", err.Error())
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("call ListModels got error: %s", err.Error())})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
-}
-
-func completion(ctx *gin.Context) {
+func chat(ctx *gin.Context) {
+	logger.Infof("Get msg from openai")
 	chat := &models.ChatRequest{}
 	if err := ctx.Bind(chat); err != nil {
 		logger.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// tokens := 5
-	// if chat.Tokens != 0 {
-	// 	tokens = chat.Tokens
-	// }
-	resp, err := client.CreateCompletion(
-		context.Background(),
-		openai.CompletionRequest{
-			Model:  openai.GPT3TextDavinci003,
-			Prompt: chat.Content,
-		},
-	)
+
+	response, err := goChat(chat.Content, chat.Tokens)
 	if err != nil {
-		logger.Errorf("get completion response from openai error: %s", err.Error())
-		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "error": err.Error()})
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": response})
 }
