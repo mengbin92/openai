@@ -9,6 +9,7 @@ redis:
   addr: redis:6379
   db: 0
   password:
+  expire: 60
 
 log:
   # 支持debug(-1)、info(0)、warn(1)、error(2)、dpanic(3)、panic(4)、fatal(5)

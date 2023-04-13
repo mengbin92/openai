@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/sha1"
+	"crypto/sha512"
 	"encoding/hex"
 	"encoding/xml"
 	"sort"
@@ -94,4 +95,15 @@ func (p *WeChatVerify) Verify(token string) bool {
 	} else {
 		return false
 	}
+}
+
+type WeChatCache struct {
+	OpenID  string `json:"open_id"`
+	Content string `json:"content"`
+}
+
+func (cache *WeChatCache) Key() string {
+	hash := sha512.New384()
+	hash.Write([]byte(cache.OpenID + "-" + cache.Content))
+	return hex.EncodeToString(hash.Sum(nil))
 }

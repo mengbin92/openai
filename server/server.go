@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mengbin92/openai/common/cache"
 	"github.com/mengbin92/openai/log"
 	"github.com/mengbin92/openai/models"
 	"github.com/sashabaranov/go-openai"
@@ -51,17 +53,21 @@ func NewServer() *Server {
 		Token:     viper.GetString("wechat.token"),
 	}
 	logger = log.DefaultLogger().Sugar()
+	err := cache.Init()
+	if err != nil {
+		panic(fmt.Errorf("init redis error: %s", err.Error()))
+	}
 	return &Server{}
 }
 
 func (s *Server) Run(port string) error {
 	engine := gin.Default()
 
-	engine.GET("/chat", chat)
-	engine.GET("/wx", weChatVerify)
-	engine.POST("/wx", weChat)
-	engine.GET("/models", listModels)
-	engine.GET("/completion", completion)
+	engine.GET("ai/chat", chat)
+	engine.GET("ai/wx", weChatVerify)
+	engine.POST("ai/wx", weChat)
+	engine.GET("ai/models", listModels)
+	engine.GET("ai/completion", completion)
 
 	s.sv = &http.Server{
 		Addr:    ":" + port,

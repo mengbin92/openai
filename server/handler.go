@@ -10,8 +10,10 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gin-gonic/gin"
+	"github.com/mengbin92/openai/common/cache"
 	"github.com/mengbin92/openai/models"
 	"github.com/sashabaranov/go-openai"
+	"github.com/spf13/viper"
 )
 
 func chat(ctx *gin.Context) {
@@ -79,18 +81,39 @@ func weChat(ctx *gin.Context) {
 
 	switch reqBody.MsgType {
 	case "text":
+		reqCache := &models.WeChatCache{
+			OpenID:  reqBody.FromUserName,
+			Content: reqBody.Content,
+		}
+
 		resp := &models.WeChatMsg{}
 		resp.FromUserName = reqBody.ToUserName
 		resp.ToUserName = reqBody.FromUserName
 		resp.CreateTime = time.Now().Unix()
 		resp.MsgType = "text"
-		chatResp, err := goChat(reqBody.Content, 0)
-		if err != nil {
-			logger.Errorf("call chatGPT got error: %s", err.Error())
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("call chatGPT got error: %s", err.Error())})
-			return
+
+		reply, err := cache.Get().Get(context.Background(), reqCache.Key()).Bytes()
+		if err != nil && len(reply) == 0 {
+			logger.Info("get nothing from local cache,now get data from openai")
+			go func() {
+				chatResp, err := goChat(reqBody.Content, 0)
+				if err != nil {
+					logger.Errorf("call chatGPT got error: %s", err.Error())
+					ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("call chatGPT got error: %s", err.Error())})
+					return
+				}
+			LOOP:
+				err = cache.Get().Set(context.Background(), reqCache.Key(), []byte(chatResp.Choices[0].Message.Content), viper.GetDuration("redis.expire")*time.Second).Err()
+				if err != nil {
+					logger.Debugf("Set data error: %s", err.Error())
+					goto LOOP
+				}
+			}()
+			time.Sleep(time.Second)
+			resp.Content = "前方网络拥堵....\n等待是为了更好的相遇，稍后请重新发送上面的问题来获取答案，感谢理解"
+		} else {
+			resp.Content = string(reply)
 		}
-		resp.Content = chatResp.Choices[0].Message.Content
 		respBytes, _ := xml.Marshal(resp)
 		logger.Infof("return msg to wechat: %s", string(respBytes))
 		ctx.Writer.Header().Set("Content-Type", "text/xml")
