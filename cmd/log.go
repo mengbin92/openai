@@ -1,4 +1,4 @@
-package log
+package main
 
 import (
 	"os"
@@ -36,18 +36,18 @@ func DefaultLogger() *zap.Logger {
 }
 
 func setLogLevel(log *zap.Logger) *zap.Logger {
-	switch viper.GetString("log.level") {
-	case "DEBUG":
+	switch viper.GetInt("log.level") {
+	case -1:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.DebugLevel))
-	case "INFO":
+	case 0:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.InfoLevel))
-	case "ERROR":
+	case 1:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.WarnLevel))
-	case "DPANIC":
+	case 3:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.DPanicLevel))
-	case "PANIC":
+	case 4:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.PanicLevel))
-	case "FATAL":
+	case 5:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.FatalLevel))
 	default:
 		return log.WithOptions(zap.IncreaseLevel(zapcore.ErrorLevel))
