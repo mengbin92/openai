@@ -41,3 +41,10 @@ const (
 	TextModerationStable   = "text-moderation-stable"
 	TextModerationLatest   = "text-moderation-latest"
 )
+
+// chat role defined by OpenAI
+const (
+	ChatMessageRoleUser      = "user"
+	ChatMessageRoleSystem    = "system"
+	ChatMessageRoleAssistant = "assistant"
+)

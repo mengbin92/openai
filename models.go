@@ -2,6 +2,7 @@ package openai
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -40,5 +41,14 @@ func (c *Client) ModelList(ctx context.Context) (list ModelList, err error) {
 		return
 	}
 	err = c.sendRequest(req, &list)
+	return
+}
+
+func (c *Client) ModelInfo(ctx context.Context, name string) (model Model, err error) {
+	req, err := c.requestFactory.Build(ctx, http.MethodGet, fmt.Sprintf("%s/%s", fullURL(models), name), nil)
+	if err != nil {
+		return
+	}
+	err = c.sendRequest(req, &model)
 	return
 }

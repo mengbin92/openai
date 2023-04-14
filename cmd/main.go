@@ -68,7 +68,7 @@ func chat(ctx *gin.Context) {
 	req := &openai.ChatCompletionRequset{
 		Model: openai.GPT3Dot5Turbo,
 		Messages: []openai.Message{
-			{Role: "user", Content: request.Content},
+			{Role: openai.ChatMessageRoleUser, Content: request.Content},
 		},
 		Temperature: 0.2,
 	}
