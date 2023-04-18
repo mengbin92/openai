@@ -10,6 +10,8 @@ type Message struct {
 	Content string `json:"content,omitempty"`
 }
 
+// ChatCompletionRequest struct defines the openAI ChatCompletionRequest type.
+// The purpose of this struct is to define the parameters required to make a request to an OpenAI API endpoint to perform chat completion.
 type ChatCompletionRequset struct {
 	Model            string                 `json:"model,omitempty"`
 	Messages         []Message              `json:"messages,omitempty"`
@@ -45,7 +47,15 @@ type ChatCompletionResponse struct {
 	Usage   Usage    `json:"usage"`
 }
 
+// The function CreateChatCompletion creates a new completed chat.
+// It takes in parameters: 
+// - ctx, of type context.Context which is the execution context of the function.
+// - request, of type *ChatCompletionRequset which contains the necessary information to create a new chat completion.
+// It returns:
+// - response, of type ChatCompletionResponse which contains the response from the server.
+// - err, of type error which contains any errors that occurred. If there were no errors, it will be nil.
 func (c *Client) CreateChatCompletion(ctx context.Context, request *ChatCompletionRequset) (response ChatCompletionResponse, err error) {
+	// Build the request using the request factory.
 	req, err := c.requestFactory.Build(ctx, http.MethodPost, fullURL(chatCompletion), request)
 	if err != nil {
 		return
