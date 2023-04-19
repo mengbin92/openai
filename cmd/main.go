@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,7 +10,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mengbin92/openai"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
+)
+
+var (
+	weChatInfo *openai.WeChatInfo
+	log        *zap.SugaredLogger
+	client     *openai.Client
+	cache      *redis.Client
 )
 
 func main() {
@@ -21,9 +29,26 @@ func main() {
 		panic(fmt.Sprintf("load config error: %s", err.Error()))
 	}
 
+	// init log
+	log = defaultLogger().Sugar()
+
+	// init redis
+	if err = initRedis(); err != nil {
+		log.Panicf("init redis error: %s", err.Error())
+	}
+	cache = getRedisClient()
+
+	// init weChat info
+	initWeChatInfo()
+
+	// init openAI handler
+	initOpenAIClient()
+
 	engine := gin.Default()
 
 	engine.GET("ai/chat", chat)
+	engine.GET("ai/wx", weChatVerify)
+	engine.POST("ai/wx", weChat)
 
 	sv := &http.Server{
 		Addr:    ":" + viper.GetString("port"),
@@ -41,26 +66,29 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Println("Shutdown Server ...")
+	log.Info("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := sv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
-	log.Println("Server exiting")
+	log.Info("Server exiting")
 }
 
-func chat(ctx *gin.Context) {
+func initOpenAIClient() {
 	apikey := viper.GetString("openai.apikey")
 	org := viper.GetString("openai.org")
 	proxyURL := viper.GetString("openai.proxy")
 
-	client := openai.NewClient(apikey, org, proxyURL)
+	client = openai.NewClient(apikey, org, proxyURL)
+}
+
+func chat(ctx *gin.Context) {
 
 	request := &openai.ChatRequest{}
 	if err := ctx.Bind(request); err != nil {
-		log.Printf("Binding Lifecycle struct error: %s\n", err.Error())
+		log.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -70,7 +98,7 @@ func chat(ctx *gin.Context) {
 		Messages: []openai.Message{
 			{Role: openai.ChatMessageRoleUser, Content: request.Content},
 		},
-		Temperature: 0.2,
+		Temperature: 1,
 	}
 
 	resp, err := client.CreateChatCompletion(ctx, req)

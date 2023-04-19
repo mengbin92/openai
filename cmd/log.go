@@ -9,7 +9,7 @@ import (
 )
 
 // DefaultLogger,stdout
-func DefaultLogger() *zap.Logger {
+func defaultLogger() *zap.Logger {
 	var coreArr []zapcore.Core
 
 	//获取编码器
