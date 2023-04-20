@@ -65,22 +65,22 @@ func weChat(ctx *gin.Context) {
 	reqBytes, _ := sonic.Marshal(reqBody)
 	log.Infof("Get requset from wechat: %s", string(reqBytes))
 
+	reqCache := &openai.WeChatCache{
+		OpenID:  reqBody.FromUserName,
+		Content: reqBody.Content,
+	}
+
+	resp := &openai.WeChatMsg{}
+	resp.FromUserName = reqBody.ToUserName
+	resp.ToUserName = reqBody.FromUserName
+	resp.CreateTime = time.Now().Unix()
+	resp.MsgType = reqBody.MsgType
+
+	respChan := make(chan string)
+	errChan := make(chan error)
+
 	switch reqBody.MsgType {
 	case "text":
-		reqCache := &openai.WeChatCache{
-			OpenID:  reqBody.FromUserName,
-			Content: reqBody.Content,
-		}
-
-		resp := &openai.WeChatMsg{}
-		resp.FromUserName = reqBody.ToUserName
-		resp.ToUserName = reqBody.FromUserName
-		resp.CreateTime = time.Now().Unix()
-		resp.MsgType = "text"
-
-		respChan := make(chan string)
-		errChan := make(chan error)
-
 		reply, err := cache.Get(context.Background(), reqCache.Key()).Bytes()
 		if err != nil && len(reply) == 0 {
 			log.Info("get nothing from local cache,now get data from openai")
