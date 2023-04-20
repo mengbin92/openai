@@ -11,6 +11,7 @@ const (
 	embeddings          = "embeddings"
 	moderations         = "moderations"
 	models              = "models"
+	files               = "files"
 )
 
 // model list from https://platform.openai.com/docs/models/model-endpoint-compatibility

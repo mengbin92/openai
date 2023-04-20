@@ -51,6 +51,7 @@ func main() {
 	engine.GET("ai/edits", edits)
 	engine.GET("ai/images", imageGen)
 	engine.GET("ai/embedding", embedding)
+	engine.POST("ai/upload", upload)
 
 	engine.GET("ai/wx", weChatVerify)
 	engine.POST("ai/wx", weChat)

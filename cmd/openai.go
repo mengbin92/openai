@@ -52,8 +52,8 @@ func audio(ctx *gin.Context) {
 	io.Copy(src, file)
 
 	req := &openai.TranscriptionsRequest{
-		File:     src,
-		Model:    openai.GPT3Whisper1,
+		File:  src,
+		Model: openai.GPT3Whisper1,
 	}
 	resp, err := client.CreateTranscriptions(ctx, req)
 	if err != nil {
@@ -123,6 +123,42 @@ func embedding(ctx *gin.Context) {
 
 	resp, err := client.CreateEmbeddings(ctx, req)
 	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func upload(ctx *gin.Context) {
+	log.Info("upload file to openai")
+	purpose := ctx.PostForm("purpose")
+	if purpose == "" {
+		purpose = "fine-tune"
+	}
+
+	file, fileHeader, err := ctx.Request.FormFile("file")
+	if err != nil {
+		log.Errorf("获取file文件失败, %s\n", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	defer file.Close()
+
+	src, _ := os.Create(fileHeader.Filename)
+	defer src.Close()
+
+	defer os.Remove(fileHeader.Filename)
+
+	io.Copy(src, file)
+
+	req := &openai.FileRequest{
+		File:    fileHeader.Filename,
+		Purpose: purpose,
+	}
+
+	resp, err := client.CreateFile(ctx, req)
+	if err != nil {
+		log.Errorf("get error when up load file: %s", err.Error())
 		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
 		return
 	}
