@@ -2,6 +2,7 @@
 package openai
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 
@@ -17,6 +18,7 @@ type Client struct {
 
 	HttpClient     *http.Client
 	requestFactory RequestFactory
+	formFactory    func(body io.Writer) FormFactory
 }
 
 // NewClient creates and returns a new instance of the Client struct.
@@ -28,6 +30,9 @@ func NewClient(apikey, org, proxyUrl string) *Client {
 		org:            org,
 		proxyUrl:       proxyUrl,
 		requestFactory: &httpRequestFactory{},
+		formFactory: func(body io.Writer) FormFactory {
+			return newDefaultForm(body)
+		},
 	}
 
 	// If a proxy URL was provided, set up an HTTP client with the proxy details
@@ -58,7 +63,10 @@ func (c *Client) sendRequest(req *http.Request, v interface{}) error {
 	// Set the headers for the request being sent
 	req.Header.Set("Accept", "application/json; charset=utf-8")
 	req.Header.Add("Authorization", "Bearer "+c.apiKey)
-	req.Header.Add("Content-Type", "application/json")
+	contentType := req.Header.Get("Content-Type")
+	if contentType == "" {
+		req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	}
 	if c.org != "" {
 		req.Header.Add("OpenAI-Organization", c.org)
 	}

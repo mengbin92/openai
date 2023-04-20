@@ -39,8 +39,7 @@ func (c *Client) CreateEdits(ctx context.Context, request *EditsRequest) (respon
 	if err != nil {
 		return
 	}
-	//send the edits request to the server using sendRequest method 
-	err = c.sendRequest(req, &response)
+	//send the edits request to the server using sendRequest method
+	err = c.sendRequest(req,  &response)
 	return
 }
-

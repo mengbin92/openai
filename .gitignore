@@ -2,3 +2,4 @@ openai
 *.tar
 *.zip
 data/
+config.yaml

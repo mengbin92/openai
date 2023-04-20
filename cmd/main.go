@@ -47,6 +47,11 @@ func main() {
 	engine := gin.Default()
 
 	engine.GET("ai/chat", chat)
+	engine.POST("ai/audio", audio)
+	engine.GET("ai/edits", edits)
+	engine.GET("ai/images", imageGen)
+	engine.GET("ai/embedding", embedding)
+
 	engine.GET("ai/wx", weChatVerify)
 	engine.POST("ai/wx", weChat)
 
@@ -82,29 +87,4 @@ func initOpenAIClient() {
 	proxyURL := viper.GetString("openai.proxy")
 
 	client = openai.NewClient(apikey, org, proxyURL)
-}
-
-func chat(ctx *gin.Context) {
-
-	request := &openai.ChatRequest{}
-	if err := ctx.Bind(request); err != nil {
-		log.Errorf("Binding Lifecycle struct error: %s\n", err.Error())
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	req := &openai.ChatCompletionRequset{
-		Model: openai.GPT3Dot5Turbo,
-		Messages: []openai.Message{
-			{Role: openai.ChatMessageRoleUser, Content: request.Content},
-		},
-		Temperature: 1,
-	}
-
-	resp, err := client.CreateChatCompletion(ctx, req)
-	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }

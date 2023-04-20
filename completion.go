@@ -61,7 +61,7 @@ func (c *Client) CreateCompletion(ctx context.Context, request *CompletionReques
 		return
 	}
 	//send the completion request to the server using sendRequest method 
-	err = c.sendRequest(req, &response)
+	err = c.sendRequest(req,  &response)
 	return
 }
 

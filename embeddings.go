@@ -6,9 +6,9 @@ import (
 )
 
 type EmbeddingsRequest struct {
-	Model string      `json:"model"`
-	Input interface{} `json:"input"`
-	User  string      `json:"user,omitempty"`
+	Model string   `json:"model" form:"model,omitempty"`
+	Input []string `json:"input" form:"input"`
+	User  string   `json:"user,omitempty" form:"user,omitempty"`
 }
 
 type Embedding struct {
@@ -24,11 +24,11 @@ type EmbeddingsResponse struct {
 	Usage  Usage       `json:"usage"`
 }
 
-//The following code declares a function CreateEmbeddings for the client, which accepts a context, an EmbeddingsRequest struct and returns an EmbeddingsResponse and error.
-//The function sends a POST request to the embeddings API of the server using Build method from c.requestFactory. It builds a request using the provided arguments;  a context, http.MethodPost and full URL for the embeddings API.
-//It also checks for any errors that may occur in the process of building the request.
-//If there is no error in creating the request, then this function sends the created request using sendRequest method of client c with both the request and response structs as its parameters.
-//If there is no error encountered during the execution of the above statements, the function returns the result in the form of EmbdedingsResponse object.
+// The following code declares a function CreateEmbeddings for the client, which accepts a context, an EmbeddingsRequest struct and returns an EmbeddingsResponse and error.
+// The function sends a POST request to the embeddings API of the server using Build method from c.requestFactory. It builds a request using the provided arguments;  a context, http.MethodPost and full URL for the embeddings API.
+// It also checks for any errors that may occur in the process of building the request.
+// If there is no error in creating the request, then this function sends the created request using sendRequest method of client c with both the request and response structs as its parameters.
+// If there is no error encountered during the execution of the above statements, the function returns the result in the form of EmbdedingsResponse object.
 func (c *Client) CreateEmbeddings(ctx context.Context, request *EmbeddingsRequest) (response EmbeddingsResponse, err error) {
 
 	req, err := c.requestFactory.Build(ctx, http.MethodPost, fullURL(embeddings), request)
@@ -40,4 +40,3 @@ func (c *Client) CreateEmbeddings(ctx context.Context, request *EmbeddingsReques
 
 	return
 }
-

@@ -48,7 +48,7 @@ type ChatCompletionResponse struct {
 }
 
 // The function CreateChatCompletion creates a new completed chat.
-// It takes in parameters: 
+// It takes in parameters:
 // - ctx, of type context.Context which is the execution context of the function.
 // - request, of type *ChatCompletionRequset which contains the necessary information to create a new chat completion.
 // It returns:
