@@ -164,3 +164,45 @@ func upload(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }
+
+func deleteFile(ctx *gin.Context) {
+	log.Info("delete file from openai")
+
+	id := ctx.Param("id")
+
+	resp, err := client.DeleteFile(ctx, &openai.File{Id: id})
+	if err != nil {
+		log.Errorf("get error when delete file from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func retrieveFile(ctx *gin.Context) {
+	log.Info("retrieve file from openai")
+
+	id := ctx.Param("id")
+
+	resp, err := client.RetrieveFile(ctx, &openai.File{Id: id})
+	if err != nil {
+		log.Errorf("get error when retrieve file from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func retrieveFileContent(ctx *gin.Context) {
+	log.Info("retrieve file content from openai")
+
+	id := ctx.Param("id")
+
+	resp, err := client.RetrieveFileContent(ctx, &openai.File{Id: id})
+	if err != nil {
+		log.Errorf("get error when retrieve file content from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
