@@ -40,3 +40,6 @@ func (f *httpRequestFactory) Build(ctx context.Context, method, url string, requ
 	return http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(requestBytes))
 }
 
+func newDefaultRequestFcatory()RequestFactory{
+	return &httpRequestFactory{}
+}

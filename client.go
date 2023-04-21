@@ -29,7 +29,7 @@ func NewClient(apikey, org, proxyUrl string) *Client {
 		apiKey:         apikey,
 		org:            org,
 		proxyUrl:       proxyUrl,
-		requestFactory: &httpRequestFactory{},
+		requestFactory: newDefaultRequestFcatory(),
 		formFactory: func(body io.Writer) FormFactory {
 			return newDefaultForm(body)
 		},
@@ -100,10 +100,4 @@ func (c *Client) sendRequest(req *http.Request, v interface{}) error {
 		}
 	}
 	return nil
-}
-
-// SetFactor sets the request factory for the given client instance.
-// It takes in a RequestFactory interface as a parameter and updates the client's requestFactory field
-func (c *Client) SetFactor(factory RequestFactory) {
-	c.requestFactory = factory
 }
