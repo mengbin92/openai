@@ -16,7 +16,6 @@ import (
 )
 
 var (
-	weChatInfo *openai.WeChatInfo
 	log        *zap.SugaredLogger
 	client     *openai.Client
 	cache      *redis.Client
@@ -38,9 +37,6 @@ func main() {
 	}
 	cache = getRedisClient()
 
-	// init weChat info
-	initWeChatInfo()
-
 	// init openAI handler
 	initOpenAIClient()
 
@@ -55,9 +51,6 @@ func main() {
 	engine.DELETE("ai/file/:id", deleteFile)
 	engine.GET("ai/file/:id", retrieveFile)
 	engine.GET("ai/file/content/:id", retrieveFileContent)
-
-	engine.GET("ai/wx", weChatVerify)
-	engine.POST("ai/wx", weChat)
 
 	sv := &http.Server{
 		Addr:    ":" + viper.GetString("port"),

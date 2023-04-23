@@ -9,9 +9,16 @@ import (
 	"github.com/mengbin92/openai"
 )
 
-func chat(ctx *gin.Context) {
+// The ChatRequest struct defines the structure for requests to be sent to the chat service. It contains two fields:
+// - Content: the content of the message
+// - Tokens: the number of tokens to generate in the response.
+type ChatRequest struct {
+	Content string `json:"content" form:"content"`
+	Tokens  int    `json:"tokens,omitempty" form:"tokens,omitempty"`
+}
 
-	request := &openai.ChatRequest{}
+func chat(ctx *gin.Context) {
+	request := &ChatRequest{}
 	if err := ctx.Bind(request); err != nil {
 		log.Errorf("Binding ChatRequest struct error: %s\n", err.Error())
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
