@@ -50,6 +50,6 @@ func (f *defaultForm) FormDataContentType() string {
 	return f.writer.FormDataContentType()
 }
 
-func (f *defaultForm)Close()error{
+func (f *defaultForm) Close() error {
 	return f.writer.Close()
 }

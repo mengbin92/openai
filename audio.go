@@ -24,12 +24,12 @@ type TranscriptionsResponse struct {
 }
 
 func (c *Client) CreateTranscriptions(ctx context.Context, request *TranscriptionsRequest) (response TranscriptionsResponse, err error) {
-	c.callAudio(ctx, request, audioTranscriptions)
+	response, err = c.callAudio(ctx, request, audioTranscriptions)
 	return
 }
 
 func (c *Client) CreateTranslations(ctx context.Context, request *TranscriptionsRequest) (response TranscriptionsResponse, err error) {
-	c.callAudio(ctx, request, audioTranslations)
+	response, err = c.callAudio(ctx, request, audioTranslations)
 	return
 }
 

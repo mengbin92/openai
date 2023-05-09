@@ -17,7 +17,7 @@ type ErrResponse struct {
 	Err *APIError `json:"error,omitempty"`
 }
 
-func (e *ErrResponse) Error() string {
+func (e ErrResponse) Error() string {
 	return e.Err.Message
 }
 
