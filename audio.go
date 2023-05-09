@@ -5,18 +5,17 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/pkg/errors"
 )
 
 type TranscriptionsRequest struct {
-	File           *os.File `json:"file"`
-	Model          string   `json:"model"` // only whisper-1
-	Prompt         string   `json:"prompt,omitempty"`
-	ResponseFormat string   `json:"response_format,omitempty"` // json, text, srt, verbose_json, or vtt
-	Temperature    float64  `json:"temperature,omitempty"`
-	Language       string   `json:"language,omitempty"`
+	FilePath       string  `json:"file_path"`
+	Model          string  `json:"model"` // only whisper-1
+	Prompt         string  `json:"prompt,omitempty"`
+	ResponseFormat string  `json:"response_format,omitempty"` // json, text, srt, verbose_json, or vtt
+	Temperature    float64 `json:"temperature,omitempty"`
+	Language       string  `json:"language,omitempty"`
 }
 
 type TranscriptionsResponse struct {
@@ -38,7 +37,7 @@ func (c *Client) callAudio(ctx context.Context, request *TranscriptionsRequest, 
 	factory := c.formFactory(buf)
 
 	// read audio file
-	err = factory.CreateFormFile("file", request.File)
+	err = factory.CreateFormFile("file", request.FilePath)
 	if err != nil {
 		errors.Wrap(err, "load audio file error")
 		return
@@ -72,6 +71,11 @@ func (c *Client) callAudio(ctx context.Context, request *TranscriptionsRequest, 
 			errors.Wrap(err, "write temperature error")
 			return
 		}
+	}
+
+	if err = factory.Close(); err != nil {
+		errors.Wrap(err, "close multipart error")
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullURL(url), buf)

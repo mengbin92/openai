@@ -59,8 +59,8 @@ func audio(ctx *gin.Context) {
 	io.Copy(src, file)
 
 	req := &openai.TranscriptionsRequest{
-		File:  src,
-		Model: openai.GPT3Whisper1,
+		FilePath: fileHeader.Filename,
+		Model:    openai.GPT3Whisper1,
 	}
 	resp, err := client.CreateTranscriptions(ctx, req)
 	if err != nil {

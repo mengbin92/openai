@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/pkg/errors"
 )
@@ -38,13 +37,13 @@ func (c *Client) CreateImage(ctx context.Context, request *ImagesReuqest) (respo
 }
 
 type ImagesEditReuqest struct {
-	Image          *os.File `json:"image"`
-	Mask           *os.File `json:"mask,omitempty"`
-	Prompt         string   `json:"prompt"`
-	N              int      `json:"n,omitempty"`
-	Size           string   `json:"size,omitempty"`
-	ResponseFormat string   `json:"response_format,omitempty"` // url or b64_json
-	User           string   `json:"user,omitempty"`
+	Image          string `json:"image"`
+	Mask           string `json:"mask,omitempty"`
+	Prompt         string `json:"prompt"`
+	N              int    `json:"n,omitempty"`
+	Size           string `json:"size,omitempty"`
+	ResponseFormat string `json:"response_format,omitempty"` // url or b64_json
+	User           string `json:"user,omitempty"`
 }
 
 func (c *Client) CreateImageEdits(ctx context.Context, request *ImagesEditReuqest) (response ImagesResponse, err error) {
@@ -58,7 +57,7 @@ func (c *Client) CreateImageEdits(ctx context.Context, request *ImagesEditReuqes
 	}
 
 	// load mask
-	if request.Mask != nil {
+	if request.Mask != "" {
 		if err = factory.CreateFormFile("mask", request.Mask); err != nil {
 			errors.Wrap(err, "load mask image error")
 			return
@@ -114,11 +113,11 @@ func (c *Client) CreateImageEdits(ctx context.Context, request *ImagesEditReuqes
 }
 
 type ImagesVariationReuqest struct {
-	Image          *os.File `json:"image"`
-	N              int      `json:"n,omitempty"`
-	Size           string   `json:"size,omitempty"`
-	ResponseFormat string   `json:"response_format,omitempty"` // url or b64_json
-	User           string   `json:"user,omitempty"`
+	Image          string `json:"image"`
+	N              int    `json:"n,omitempty"`
+	Size           string `json:"size,omitempty"`
+	ResponseFormat string `json:"response_format,omitempty"` // url or b64_json
+	User           string `json:"user,omitempty"`
 }
 
 func (c *Client) CreateImageVariation(ctx context.Context, request *ImagesVariationReuqest) (response ImagesResponse, err error) {

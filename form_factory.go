@@ -9,7 +9,7 @@ import (
 )
 
 type FormFactory interface {
-	CreateFormFile(fieldname string, file *os.File) error
+	CreateFormFile(fieldname string, filepath string) error
 	WriteField(fieldname string, value string) error
 	FormDataContentType() string
 	Close() error
@@ -25,11 +25,17 @@ func newDefaultForm(body io.Writer) FormFactory {
 	}
 }
 
-func (f *defaultForm) CreateFormFile(fieldname string, file *os.File) error {
-	fWriter, err := f.writer.CreateFormFile(fieldname, file.Name())
+func (f *defaultForm) CreateFormFile(fieldname string, filepath string) error {
+	fWriter, err := f.writer.CreateFormFile(fieldname, filepath)
 	if err != nil {
 		return errors.Wrap(err, "CreateFormFile error")
 	}
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		return errors.Wrapf(err, "read file: %s error", filepath)
+	}
+	defer file.Close()
 
 	_, err = io.Copy(fWriter, file)
 	if err != nil {
