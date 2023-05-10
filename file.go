@@ -52,14 +52,7 @@ func (c *Client) CreateFile(ctx context.Context, request *FileRequest) (response
 	buf := &bytes.Buffer{}
 	// Create a new form using the empty buffer
 	factory := c.formFactory(buf)
-	// // Open the file requested by the user
-	// file, err := os.Open(request.File)
-	// if err != nil {
-	// 	// Wrap the error with additional context for easier debugging and return it
-	// 	errors.Wrapf(err, "load file: %s error", request.File)
-	// }
-	// // Close the file when done processing
-	// defer file.Close()
+	
 	// Add the file data to the form data with the key "file"
 	if err = factory.CreateFormFile("file", request.File); err != nil {
 		// Wrap the error with additional context for easier debugging and return it
@@ -72,6 +65,14 @@ func (c *Client) CreateFile(ctx context.Context, request *FileRequest) (response
 		errors.Wrap(err, "set purpose error")
 		return
 	}
+
+	// close file multipart
+	if err = factory.Close(); err != nil {
+		// Wrap the error with additional context for easier debugging and return it
+		errors.Wrap(err, "close file multipart error")
+		return
+	}
+
 	// Create a new POST request using the provided context, URL and buffer of form data
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullURL(files), buf)
 	if err != nil {

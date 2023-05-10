@@ -213,3 +213,15 @@ func retrieveFileContent(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }
+
+func retrieveFiles(ctx *gin.Context) {
+	log.Info("retrieve files from openai")
+
+	resp, err := client.ListFiles(ctx)
+	if err != nil {
+		log.Errorf("get error when retrieve file from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}

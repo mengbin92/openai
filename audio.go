@@ -74,7 +74,7 @@ func (c *Client) callAudio(ctx context.Context, request *TranscriptionsRequest, 
 	}
 
 	if err = factory.Close(); err != nil {
-		errors.Wrap(err, "close multipart error")
+		errors.Wrap(err, "close audio multipart error")
 		return
 	}
 

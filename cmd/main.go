@@ -16,9 +16,9 @@ import (
 )
 
 var (
-	log        *zap.SugaredLogger
-	client     *openai.Client
-	cache      *redis.Client
+	log    *zap.SugaredLogger
+	client *openai.Client
+	cache  *redis.Client
 )
 
 func main() {
@@ -47,10 +47,11 @@ func main() {
 	engine.GET("ai/edits", edits)
 	engine.GET("ai/images", imageGen)
 	engine.GET("ai/embedding", embedding)
-	engine.POST("ai/file", upload)
-	engine.DELETE("ai/file/:id", deleteFile)
-	engine.GET("ai/file/:id", retrieveFile)
-	engine.GET("ai/file/content/:id", retrieveFileContent)
+	engine.POST("ai/files", upload)
+	engine.GET("ai/files", retrieveFiles)
+	engine.DELETE("ai/files/:id", deleteFile)
+	engine.GET("ai/files/:id", retrieveFile)
+	engine.GET("ai/files/content/:id", retrieveFileContent)
 
 	sv := &http.Server{
 		Addr:    ":" + viper.GetString("port"),
