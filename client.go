@@ -96,7 +96,7 @@ func (c *Client) sendRequest(req *http.Request, v interface{}) error {
 	// Handle the response from openAI
 	if v != nil {
 		if err := sonic.ConfigDefault.NewDecoder(res.Body).Decode(v); err != nil {
-			return errors.Wrap(err, "unmarshal ChatCompletionResponse error")
+			return errors.Wrap(err, "unmarshal OpenAI Response error")
 		}
 	}
 	return nil

@@ -12,11 +12,8 @@ This is a library implemented in Go for [OpenAI API](https://platform.openai.com
 * [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
 * [Audio](https://platform.openai.com/docs/api-reference/audio)
 * [Files](https://platform.openai.com/docs/api-reference/files)
-
-TODO:  
-
-- [ ] [Fine-tunes](https://platform.openai.com/docs/api-reference/fine-tunes)
-- [ ] [Moderations](https://platform.openai.com/docs/api-reference/moderations)  
+* [Fine-tunes](https://platform.openai.com/docs/api-reference/fine-tunes)
+* [Moderations](https://platform.openai.com/docs/api-reference/moderations) 
 
 ## Install
 
