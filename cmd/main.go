@@ -53,6 +53,15 @@ func main() {
 	engine.GET("ai/files/:id", retrieveFile)
 	engine.GET("ai/files/content/:id", retrieveFileContent)
 
+	engine.POST("ai/fine-tunes/:id", createFineTune)
+	engine.GET("ai/fine-tunes/:id", retrieveFineTune)
+	engine.GET("ai/fine-tunes", listFineTune)
+	engine.GET("ai/fine-tunes/events/:id", listFineTuneEvents)
+	engine.POST("ai/fine-tunes/cancle/:id", cancleFineTune)
+	engine.DELETE("ai/fine-tunes/:models", deleteFineTuneModel)
+
+	engine.POST("ai/moderations", createModerations)
+
 	sv := &http.Server{
 		Addr:    ":" + viper.GetString("port"),
 		Handler: engine,

@@ -6,8 +6,8 @@ import (
 )
 
 type ModerationRequest struct {
-	Input string
-	Model string
+	Input string `json:"input" form:"input"`
+	Model string `json:"model,omitempty" form:"model,omitempty"`
 }
 
 type ModerationResponse struct {

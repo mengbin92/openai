@@ -8,17 +8,17 @@ import (
 
 type FineTuneRequest struct {
 	TrainingFile                 string    `json:"training_file"`
-	ValidationFile               string    `json:"validation_file"`
-	Model                        string    `json:"model"`
-	NEpochs                      int       `json:"n_epochs"`
-	BatchSize                    int       `json:"batch_size"`
-	LearningRateMultiplier       float32   `json:"learning_rate_multiplier"`
-	PromptLossWeight             float32   `json:"prompt_loss_weight"`
-	ComputeClassificationMetrics bool      `json:"compute_classification_metrics"`
-	ClassificationNClasses       int       `json:"classification_n_classes"`
-	ClassificationPositiveClass  string    `json:"classification_positive_class"`
-	ClassificationBetas          []float32 `json:"classification_betas"`
-	Suffix                       string    `json:"suffix"`
+	ValidationFile               string    `json:"validation_file,omitempty"`
+	Model                        string    `json:"model,omitempty"`
+	NEpochs                      int       `json:"n_epochs,omitempty"`
+	BatchSize                    int       `json:"batch_size,omitempty"`
+	LearningRateMultiplier       float32   `json:"learning_rate_multiplier,omitempty"`
+	PromptLossWeight             float32   `json:"prompt_loss_weight,omitempty"`
+	ComputeClassificationMetrics bool      `json:"compute_classification_metrics,omitempty"`
+	ClassificationNClasses       int       `json:"classification_n_classes,omitempty"`
+	ClassificationPositiveClass  string    `json:"classification_positive_class,omitempty"`
+	ClassificationBetas          []float32 `json:"classification_betas,omitempty"`
+	Suffix                       string    `json:"suffix,omitempty"`
 }
 
 type FineTune struct {
@@ -77,7 +77,7 @@ func (c *Client) CreateFineTune(ctx context.Context, request FineTuneRequest) (r
 	return
 }
 
-func (c *Client) ListFineTune(ctx context.Context) (response FineTuneList, err error) {
+func (c *Client) ListFineTunes(ctx context.Context) (response FineTuneList, err error) {
 	req, err := c.requestFactory.Build(ctx, http.MethodGet, fullURL(fineTunes), nil)
 	if err != nil {
 		return
@@ -98,7 +98,7 @@ func (c *Client) RetrieveFineTune(ctx context.Context, id string) (response Fine
 }
 
 func (c *Client) CancelFineTune(ctx context.Context, id string) (response FineTune, err error) {
-	req, err := c.requestFactory.Build(ctx, http.MethodGet, fmt.Sprintf("%s/%s/cancel", fullURL(fineTunes), id), nil)
+	req, err := c.requestFactory.Build(ctx, http.MethodPost, fmt.Sprintf("%s/%s/cancel", fullURL(fineTunes), id), nil)
 	if err != nil {
 		return
 	}

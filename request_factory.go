@@ -8,6 +8,7 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/pkg/errors"
 )
+
 // The RequestFactory interface defines the behavior for creating an http.Request object given certain parameters.
 type RequestFactory interface {
 	Build(ctx context.Context, method, url string, request any) (*http.Request, error)
@@ -17,7 +18,7 @@ type RequestFactory interface {
 type httpRequestFactory struct{}
 
 // The Build method of the httpRequestFactory struct builds and returns an http.Request object given the specified parameters.
-// It takes in parameters: 
+// It takes in parameters:
 // - ctx, of type context.Context which is the execution context of the function.
 // - method, of type string which represents the HTTP method to be used for the request.
 // - url, of type string which is the URL that the request should be sent to.
@@ -40,6 +41,6 @@ func (f *httpRequestFactory) Build(ctx context.Context, method, url string, requ
 	return http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(requestBytes))
 }
 
-func newDefaultRequestFcatory()RequestFactory{
+func newDefaultRequestFcatory() RequestFactory {
 	return &httpRequestFactory{}
 }

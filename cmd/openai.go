@@ -225,3 +225,108 @@ func retrieveFiles(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
 }
+
+func createFineTune(ctx *gin.Context) {
+	log.Info("create fine-tunes from openai")
+
+	id := ctx.Param("id")
+
+	req := openai.FineTuneRequest{
+		TrainingFile: id,
+	}
+
+	resp, err := client.CreateFineTune(ctx, req)
+	if err != nil {
+		log.Errorf("get error when CreateFineTune from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func listFineTune(ctx *gin.Context) {
+	log.Info("list fine-tunes from openai")
+
+	resp, err := client.ListFineTunes(ctx)
+	if err != nil {
+		log.Errorf("get error when ListFineTunes from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func retrieveFineTune(ctx *gin.Context) {
+	log.Info("retrieve fine-tunes from openai")
+
+	id := ctx.Param("id")
+
+	resp, err := client.RetrieveFineTune(ctx, id)
+	if err != nil {
+		log.Errorf("get error when RetrieveFineTune from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func cancleFineTune(ctx *gin.Context) {
+	log.Info("cancle fine-tunes from openai")
+
+	id := ctx.Param("id")
+
+	resp, err := client.CancelFineTune(ctx, id)
+	if err != nil {
+		log.Errorf("get error when CancelFineTune from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func listFineTuneEvents(ctx *gin.Context) {
+	log.Info("cancle fine-tunes from openai")
+
+	id := ctx.Param("id")
+
+	resp, err := client.ListFineTuneEvents(ctx, id)
+	if err != nil {
+		log.Errorf("get error when ListFineTuneEvents from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func deleteFineTuneModel(ctx *gin.Context) {
+	log.Info("delete fine-tunes model from openai")
+
+	models := ctx.Param("models")
+
+	resp, err := client.DeleteFineTuneModel(ctx, models)
+	if err != nil {
+		log.Errorf("get error when DeleteFineTuneModel from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
+
+func createModerations(ctx *gin.Context) {
+	log.Info("create moderations from openai")
+
+	var req openai.ModerationRequest
+	if err := ctx.Bind(&req); err != nil {
+		log.Errorf("Binding ModerationRequest struct error: %s\n", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := client.CreateModeration(ctx, req)
+	if err != nil {
+		log.Errorf("get error when DeleteFineTuneModel from openai: %s", err.Error())
+		ctx.JSON(http.StatusOK, gin.H{"code": http.StatusInternalServerError, "msg": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": resp})
+}
