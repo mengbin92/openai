@@ -3,9 +3,12 @@ version: 1.0.0
 port: 9999
 
 openai:
+  # 支持OpenAI_APIKEY和accessToken，优先使用OPENAI_APIKEY，要使用accessToken，OPENAI_APIKEY需要设置为空
   apikey: OPENAI_APIKEY
   org:
   proxy: http://172.26.128.1:1080
+  # 在浏览器中登录 https://chat.openai.com/chat后访问https://chat.openai.com/api/auth/session获取
+  accessToken: ACCESS_TOKEN
 
 log:
   # 支持debug(-1)、info(0)、warn(1)、error(2)、dpanic(3)、panic(4)、fatal(5)
@@ -16,8 +19,3 @@ redis:
   db: 0
   password: PASSWORD
   expire: 600
-
-wechat:
-  token: chatGPT
-  appID: APPID
-  appsecret: APPSECRET

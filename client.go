@@ -12,9 +12,10 @@ import (
 
 // Clinet is the openAI API client
 type Client struct {
-	apiKey   string
-	org      string
-	proxyUrl string
+	apiKey      string
+	org         string
+	proxyUrl    string
+	accessToken string
 
 	HttpClient     *http.Client
 	requestFactory RequestFactory
@@ -23,12 +24,13 @@ type Client struct {
 
 // NewClient creates and returns a new instance of the Client struct.
 // It takes in an API key, organization name and proxy URL as strings
-func NewClient(apikey, org, proxyUrl string) *Client {
+func NewClient(apikey, org, proxyUrl, accessToken string) *Client {
 	// Create a new instance of the Client struct with the given parameters
 	client := &Client{
 		apiKey:         apikey,
 		org:            org,
 		proxyUrl:       proxyUrl,
+		accessToken:    accessToken,
 		requestFactory: newDefaultRequestFcatory(),
 		formFactory: func(body io.Writer) FormFactory {
 			return newDefaultForm(body)
@@ -62,7 +64,12 @@ func NewClient(apikey, org, proxyUrl string) *Client {
 func (c *Client) sendRequest(req *http.Request, v interface{}) error {
 	// Set the headers for the request being sent
 	req.Header.Set("Accept", "application/json; charset=utf-8")
-	req.Header.Add("Authorization", "Bearer "+c.apiKey)
+	if c.apiKey != "" {
+		req.Header.Add("Authorization", "Bearer "+c.apiKey)
+	} else {
+		req.Header.Add("Authorization", "Bearer "+c.accessToken)
+	}
+
 	contentType := req.Header.Get("Content-Type")
 	if contentType == "" {
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
