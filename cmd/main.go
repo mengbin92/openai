@@ -92,6 +92,7 @@ func initOpenAIClient() {
 	apikey := viper.GetString("openai.apikey")
 	org := viper.GetString("openai.org")
 	proxyURL := viper.GetString("openai.proxy")
+	accessToken := viper.GetString("openai.accessToken")
 
-	client = openai.NewClient(apikey, org, proxyURL)
+	client = openai.NewClient(apikey, org, proxyURL, accessToken)
 }
